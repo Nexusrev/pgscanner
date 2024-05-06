@@ -1,9 +1,12 @@
-# src/scanner.py
-
 import os
 import time
 import logging
 from multiprocessing import Pool
+import argparse
+from colorama import Fore, Style, init
+
+# Initialize colorama to make terminal text color work on all platforms
+init(autoreset=True)
 
 # Setup for the logs directory
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -35,15 +38,26 @@ def search_configs(search_root, configs):
         results = pool.starmap(find_config, [(config, search_root) for config in configs])
     return [path for sublist in results for path in sublist if path]
 
+def setup_arg_parser():
+    """Setup CLI argument parser."""
+    parser = argparse.ArgumentParser(description='PostgreSQL Configuration File Scanner')
+    parser.add_argument('-p', '--path', type=str, required=True, help='Root directory to start the scan')
+    parser.add_argument('-c', '--configs', nargs='+', default=['postgresql.conf', 'pg_hba.conf'], help='List of config files to scan for')
+    return parser
+
+def main():
+    parser = setup_arg_parser()
+    args = parser.parse_args()
+    
+    print(Fore.YELLOW + Style.BRIGHT + "Starting pgscanner...")
+    found_configs = search_configs(args.path, args.configs)
+    
+    if found_configs:
+        print(Fore.GREEN + Style.BRIGHT + "Found configuration files:")
+        for config in found_configs:
+            print(Fore.CYAN + config)
+    else:
+        print(Fore.RED + "No configuration files found.")
+
 if __name__ == "__main__":
-    # Define the directory to scan and configuration files to look for
-    test_search_root = '/Users/nicolasramirez'  # Modify this path to a suitable test location
-    test_configs = ['postgresql.conf', 'pg_hba.conf', 'pg_ident.conf']
-    
-    # Call the search_configs function
-    found_configs = search_configs(test_search_root, test_configs)
-    
-    # Print the results
-    print("Found configuration files:")
-    for config in found_configs:
-        print(config)
+    main()
