@@ -6,7 +6,7 @@ from scanner import search_configs
 class TestScanner(unittest.TestCase):
     def test_search_configs(self):
         # Define the directory to scan and configurations to search for
-        test_search_root = '/path/to/test/directory'  # Modify this path accordingly
+        test_search_root = '/Users/nicolasramirez'  # Modify this path accordingly
         test_configs = ['postgresql.conf', 'pg_hba.conf', 'pg_ident.conf']
         
         # Perform the search
